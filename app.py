@@ -1,11 +1,19 @@
 from flask import Flask, flash, request, redirect, url_for
+from flask_cors import CORS, cross_origin
 app = Flask(__name__)
 import os
 import resume_parser
+
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
+
+
 @app.route('/hello')
+@cross_origin()
 def hello():
     return 'Hello, World!'
 @app.route('/upload',methods=['POST'])
+@cross_origin()
 def upload_file():
     if request.method == 'POST':
         file = request.files['file']
