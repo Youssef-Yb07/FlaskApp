@@ -1,5 +1,4 @@
-from flask 
-import Flask, flash, request, redirect, url_for
+from flask import Flask, flash, request, redirect, url_for
 app = Flask(__name__)
 import os
 import resume_parser
@@ -15,3 +14,4 @@ def upload_file():
         file.save(new_path)
         return resume_parser.extract_all_data(new_path)
     return 'Please upload your file'
+
