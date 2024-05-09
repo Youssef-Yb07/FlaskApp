@@ -1,3 +1,9 @@
+# importing the required libraries
+# pathlib is used to get the filename without the extension
+# re is used for regular expressions that will help to extract the contact number and email from the resume
+# fuzzywuzzy is used to find the similar strings in the document
+# pdfminer is used to extract the text from the pdf
+# spacy is used for natural language processing that will help to extract the candidate's name from the resume
 from pathlib import Path
 import re
 from fuzzywuzzy import process
@@ -6,6 +12,7 @@ import spacy
 from spacy.matcher import Matcher
  
  
+# define a function to get the filename without the extension
 def get_filename_without_extension(file_path):
  
     # Convert the file path to a Path object and get the filename without the extension
@@ -29,7 +36,19 @@ def clean_filename(text):
  
     return text
  
+
+
  
+# Define a function to find similar strings in a document
+# The function will return the top N matches based on the similarity score
+# and a similarity threshold
+# The function will use the fuzzywuzzy library to find similar strings
+# in the document text
+# The function will return a list of tuples containing the matched string
+# and the similarity score
+# The function will also clean the filename by removing dashes, underscores,
+# parentheses, square brackets, numbers, and extra spaces
+
 def find_similar_strings_in_document(document_text, filename, top_n=5, similarity_threshold=80):
     filename = clean_filename(filename)
     # Split the document text into words
@@ -47,9 +66,13 @@ def find_similar_strings_in_document(document_text, filename, top_n=5, similarit
     return filtered_matches
  
  
+# Define a function to extract text from a PDF file 
 def extract_text_from_pdf(pdf_path):
     return extract_text(pdf_path)
  
+# Define a function to extract the contact number from the resume
+# The function will use regular expressions to find the contact number in the text
+
 def extract_contact_number_from_resume(text):
     contact_number = None
  
@@ -67,6 +90,9 @@ def extract_contact_number_from_resume(text):
  
     return contact_number
  
+
+# Define a function to extract the email address from the resume
+# The function will use regular expressions to find the email address in the text 
 def extract_email_from_resume(text):
     email = None
  
@@ -77,7 +103,9 @@ def extract_email_from_resume(text):
         email = match.group()
  
     return email
- 
+
+# Define a function to extract skills from the resume
+# The function will use a list of skills and a regular expression pattern 
 def extract_skills_from_resume(text, skills_list):
     skills = []
  
@@ -89,11 +117,14 @@ def extract_skills_from_resume(text, skills_list):
  
     return skills
  
+
+# Define a function to extract education information from the resume
+# The function will use a regular expression pattern to find education information
 def extract_education_from_resume(text):
     education = []
  
     # Use regex pattern to find education information
-    pattern = r"(?i)(faculté|école|université|institut|grande école|bachelor|master|doctorat|ensa|fst|ensam|ehtp)\b\s*(.*?)(?=\.|\n|;|,|$)"
+    pattern = r"(?i)(faculté|école|université|institut|grande école|bachelor|master|doctorat|ensa|fst|ensam|ehtp|uir|internationale|école|rabat)\b\s*(.*?)(?=\.|\n|;|,|$)"
     matches = re.findall(pattern, text)
     for match in matches:
         education.append(match[0] + " " + match[1].strip())
@@ -101,13 +132,19 @@ def extract_education_from_resume(text):
     return education
  
  
+
+# Define a function to extract the candidate's name from the resume
+# The function will use spaCy for natural language processing
+# and a pattern matcher to find the name in the text
 def extract_name(resume_text):
+    # Load the spaCy model
     nlp = spacy.load('fr_core_news_sm')
+    # Initialize the matcher
     matcher = Matcher(nlp.vocab)
  
     # Define name patterns
     patterns = [
-        [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name and Last name
+        [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name and Last name 
         [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name, Middle name, and Last name
         [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}]  # First name, Middle name, Middle name, and Last name
     ]
@@ -124,6 +161,9 @@ def extract_name(resume_text):
  
     return None
  
+# Define a function to count the total months of experience from the resume
+# The function will use regular expressions to find date ranges in the experience section
+# and calculate the total months worked 
 def count_experience_months(resume_text):
     # Define a pattern to match variations of the experience section title
     experience_pattern = re.compile(r'(?:EXPÉRIENCES PROFESSIONNELLES?|EXPÉRIENCE PROFESSIONNELLE|Professional Experiences & Projects|Exp[ée]riences\s+Professionnelles?|Exp[ée]rienc\s+es\s+pr\s+ofessionnelles?|EXPÉRIENCES?:)', re.IGNORECASE)
@@ -152,6 +192,8 @@ def count_experience_months(resume_text):
  
         # Check if we are within the experience section
         if within_experiences_section:
+
+            #manage all cases of date ranges in the experience section
            
             # 1. Check if the line contains date ranges in the format "De février 2024 à juillet 2024"
             matches1 = re.findall(r'(?:De|du) (\w+) (\d{4}) (?:à|au) (\w+) (\d{4})', line)
@@ -188,14 +230,19 @@ def count_experience_months(resume_text):
     remaining_months = int(total_months_worked % 12)
  
     return total_years;
- 
+
+
+# Define a function to extract the LinkedIn profile URL from the resume
+# The function will use a regular expression pattern to find LinkedIn profile URLs
 def extract_linkedin(resume_text):
     # Define a regular expression pattern to match LinkedIn profile URLs
         linkedin_pattern = r'(?:https?://)?(?:www\.)?linkedin\.com/(?:\w+/)?(?:in|pub|profile)/[\w-]+/?'
           # Find all LinkedIn profile URLs in the resume text
         linkedin_urls = re.findall(linkedin_pattern, resume_text)
         return linkedin_urls;
- 
+
+# this is the main function that will extract all the information from the resume and 
+#call all the functions defined above 
 def extract_all_data(path):
     resume_paths = [path]
  
@@ -259,57 +306,3 @@ def extract_all_data(path):
         
         
         return response
- 
- 
-if __name__ == '__main__':
-    resume_paths = [r"CV-Hamza-ELGARAI (1).pdf"]
- 
-    for resume_path in resume_paths:
-        text = extract_text_from_pdf(resume_path)
-        filename = get_filename_without_extension(resume_path)
-        similar_strings = find_similar_strings_in_document(text,filename)
-        print(similar_strings)
- 
-        print("Resume:", resume_path)
- 
- 
-        name = extract_name(text)
-        if name:
-            print("Name:", name)
-        else:
-            print("Name not found")
- 
-        contact_number = extract_contact_number_from_resume(text)
-        if contact_number:
-            print("Contact Number:", contact_number.replace('\n',''))
-        else:
-            print("Contact Number not found")
- 
-        email = extract_email_from_resume(text)
-        if email:
-            print("Email:", email)
-        else:
-            print("Email not found")
- 
-        skills_list = ['Python', 'Data Analysis', 'Machine Learning', 'Communication', 'Project Management', 'Deep Learning', 'SQL', 'Tableau', 'LWC','Keycloak','Laravel','HTML','CSS','JS','Java','JavaScript']
-        extracted_skills = extract_skills_from_resume(text, skills_list)
-        if extracted_skills:
-            print("Skills:", extracted_skills)
-        else:
-            print("No skills found")
- 
-        extracted_education = extract_education_from_resume(text)
-        if extracted_education:
-            print("Education:", extracted_education)
-        else:
-            print("No education information found")
- 
-        extracted_education = extract_education_from_resume(text)
-        if extracted_education:
-            print("Education:", extracted_education)
-        else:
-            print("No education information found")
- 
-        print()
- 
- 
