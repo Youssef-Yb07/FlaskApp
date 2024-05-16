@@ -10,6 +10,19 @@ from fuzzywuzzy import process
 from pdfminer.high_level import extract_text
 import spacy
 from spacy.matcher import Matcher
+nlp = spacy.load('fr_core_news_sm')
+# Initialize the matcher
+matcher = Matcher(nlp.vocab)
+
+# Define name patterns
+patterns = [
+    [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name and Last name 
+    [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name, Middle name, and Last name
+    [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}]  # First name, Middle name, Middle name, and Last name
+]
+
+for pattern in patterns:
+    matcher.add('NAME', patterns=[pattern])
  
  
 # define a function to get the filename without the extension
@@ -138,19 +151,7 @@ def extract_education_from_resume(text):
 # and a pattern matcher to find the name in the text
 def extract_name(resume_text):
     # Load the spaCy model
-    nlp = spacy.load('fr_core_news_sm')
-    # Initialize the matcher
-    matcher = Matcher(nlp.vocab)
- 
-    # Define name patterns
-    patterns = [
-        [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name and Last name 
-        [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}],  # First name, Middle name, and Last name
-        [{'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}, {'IS_ALPHA': True, 'OP': '+'}]  # First name, Middle name, Middle name, and Last name
-    ]
- 
-    for pattern in patterns:
-        matcher.add('NAME', patterns=[pattern])
+    
  
     doc = nlp(resume_text)
     matches = matcher(doc)
