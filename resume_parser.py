@@ -280,7 +280,7 @@ def extract_all_data(path):
  
         # this skills list will be used to extract the skills from the resume 
         # by comparing the skills in the resume with the skills in the list
-        skills_list = ['Python', 'Data Analysis', 'Machine Learning', 'Communication', 'Project Management', 'Deep Learning', 'SQL', 'Tableau', 'LWC','Keycloak','Laravel','HTML','CSS','JS','Java','JavaScript','TypeScript','C','Spring','Spring Boot']
+        skills_list = ['Python', 'Data Analysis', 'Machine Learning', 'Communication', 'Project Management', 'Deep Learning', 'SQL', 'Tableau', 'LWC','Keycloak','Laravel','HTML','CSS','JS','Java','JavaScript','TypeScript','C','Spring','Spring Boot','Uml','Design Patterns','Bootstrap','Hibernate','Angular','JEE','Struts 2','React','MySQl','SQLServer','PostgreSQL','MongoDB','Android','Git','Github',' JUnit','Mockito','SonarQube','TDD','Selenium','JMeter','Gatling','Cucumber','Agile','Scrum']
         extracted_skills = extract_skills_from_resume(text, skills_list)
         if extracted_skills:
             response['extracted_skills'] = extracted_skills
